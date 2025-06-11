@@ -1,0 +1,48 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Android
+.gradle/
+/android/local.properties
+/android/key.properties
+/android/app/src/main/assets/flutter_assets/kernel_blob.bin
+
+# iOS
+/ios/Flutter/App.framework
+/ios/Flutter/engine.framework
+/ios/Flutter/flutter_assets/kernel_blob.bin
+/ios/Flutter/flutter_assets/isolate_snapshot_data
+/ios/Flutter/flutter_assets/vm_snapshot_data
+/ios/Runner/GeneratedPluginRegistrant.h
+/ios/Runner/GeneratedPluginRegistrant.m
+/ios/Runner.xcworkspace/contents.xcworkspacedata
+/ios/Runner.xcworkspace/xcshareddata/
+/ios/Runner.xcodeproj/project.xcworkspace/
+/ios/Runner.xcodeproj/xcshareddata/
+/ios/Pods/
+
+# Build results
+/app/build/
+/app/ios/build/
+/app/outputs/
+
+# IDE files
+.idea/
+*.iml
