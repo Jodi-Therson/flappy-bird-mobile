@@ -32,12 +32,12 @@ Untuk menjalankan proyek ini di komputer Anda, ikuti langkah-langkah berikut.
 
 1.  **Clone repositori ini:**
     ```bash
-    git clone [https://github.com/NAMA_USER_ANDA/NAMA_REPO_ANDA.git](https://github.com/NAMA_USER_ANDA/NAMA_REPO_ANDA.git)
+    git clone https://github.com/Jodi-Therson/flappy-bird-mobile.git
     ```
 
 2.  **Masuk ke direktori proyek:**
     ```bash
-    cd NAMA_REPO_ANDA
+    cd flappy-bird-mobile
     ```
 
 3.  **Dapatkan semua paket yang dibutuhkan:**
