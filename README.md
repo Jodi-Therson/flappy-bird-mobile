@@ -81,3 +81,38 @@ flappy_bird_game/
 ├── pubspec.yaml
 └── README.md
 ```
+
+## 📦 Membuat File APK untuk Distribusi
+
+Setelah Anda selesai mengembangkan dan ingin membagikan game ini sebagai file yang bisa diinstal di perangkat Android, Anda perlu membuat file APK (Android Package Kit) versi rilis.
+
+Proses ini akan mengkompilasi kode menjadi versi yang teroptimasi, lebih kecil ukurannya, dan lebih cepat performanya.
+
+1.  **Buka Terminal**
+    Pastikan terminal atau command prompt Anda berada di dalam direktori utama proyek (`flappy-bird-mobile/`).
+
+2.  **Jalankan Perintah Build**
+    Ketikkan perintah berikut untuk memulai proses build:
+    ```bash
+    flutter build apk
+    ```
+
+3.  **Temukan File APK**
+    Setelah proses selesai, file `.apk` Anda akan berada di dalam folder berikut:
+    ```
+    build/app/outputs/flutter-apk/app-release.apk
+    ```
+
+4.  **Instal di Perangkat Android**
+    Anda bisa memindahkan file `app-release.apk` ke HP Anda menggunakan beberapa cara:
+    * **Kabel USB:** Salin file ke penyimpanan internal atau kartu SD HP Anda, lalu buka menggunakan aplikasi File Manager untuk menginstalnya.
+    * **Cloud/Email:** Unggah file ke Google Drive, Dropbox, atau kirim ke email Anda sendiri, lalu unduh dan instal di HP.
+
+    > **Catatan:** Saat pertama kali menginstal, Anda mungkin perlu memberikan izin pada HP Anda untuk "Menginstal aplikasi dari sumber yang tidak dikenal" (_Install from unknown sources_) di pengaturan keamanan.
+
+---
+### **Penting: APK vs. App Bundle (AAB)**
+Jika tujuan akhir Anda adalah mempublikasikan aplikasi ke **Google Play Store**, Google mewajibkan Anda untuk mengunggah dalam format `.aab` (Android App Bundle), bukan `.apk`. Untuk membuatnya, gunakan perintah:
+```
+flutter build appbundle
+```
