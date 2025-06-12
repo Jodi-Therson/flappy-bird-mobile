@@ -6,14 +6,19 @@ import '../game/flappy_bird_game.dart';
 
 class Bird extends SpriteAnimationComponent with HasGameRef<FlappyBirdGame>, CollisionCallbacks {
   double velocity = 0;
-  final double gravity = 400;
+  final double gravity;
+  final double jumpVelocity;
 
-  Bird() : super(size: Vector2(51, 36), anchor: Anchor.center);
+  Bird({
+    required Vector2 initialSize,
+    required this.gravity,
+    required this.jumpVelocity,
+  }) : super(size: initialSize, anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
-    animation = await gameRef.loadSpriteAnimation(
-      'bird1.png', // Hanya perlu satu nama file jika formatnya 'bird1.png', 'bird2.png', ...
+    animation = SpriteAnimation.fromFrameData(
+      gameRef.images.fromCache('bird1.png'),
       SpriteAnimationData.sequenced(
         amount: 3,
         stepTime: 0.1,
@@ -31,14 +36,14 @@ class Bird extends SpriteAnimationComponent with HasGameRef<FlappyBirdGame>, Col
       position.y += velocity * dt;
       angle = (velocity * 0.001).clamp(-0.4, 0.8);
 
-      if (position.y > gameRef.size.y - 60) {
+      if (position.y > gameRef.size.y - gameRef.groundHeight) {
         gameRef.setGameOver();
       }
     }
   }
 
   void jump() {
-    velocity = -250;
+    velocity = jumpVelocity;
     FlameAudio.play('sfx_wing.mp3');
   }
 
