@@ -4,13 +4,16 @@ import 'package:flame/flame.dart';
 import '../game/flappy_bird_game.dart';
 
 class Ground extends PositionComponent with HasGameRef<FlappyBirdGame> {
+  final double height;
+  Ground({required this.height});
+
   late SpriteComponent ground1;
   late SpriteComponent ground2;
 
   @override
   Future<void> onLoad() async {
     final groundImage = Flame.images.fromCache('ground.png');
-    final groundSize = Vector2(gameRef.size.x, 112);
+    final groundSize = Vector2(gameRef.size.x, height);
 
     ground1 = SpriteComponent(sprite: Sprite(groundImage), size: groundSize, position: Vector2(0, gameRef.size.y - groundSize.y));
     ground2 = SpriteComponent(sprite: Sprite(groundImage), size: groundSize, position: Vector2(groundSize.x, gameRef.size.y - groundSize.y));
@@ -23,8 +26,8 @@ class Ground extends PositionComponent with HasGameRef<FlappyBirdGame> {
   void update(double dt) {
     super.update(dt);
     if (gameRef.state == GameState.playing) {
-      ground1.x -= gameRef.pipeSpeed * dt;
-      ground2.x -= gameRef.pipeSpeed * dt;
+      ground1.x -= gameRef.gameSpeed * dt;
+      ground2.x -= gameRef.gameSpeed * dt;
 
       if (ground1.x <= -gameRef.size.x) {
         ground1.x = ground2.x + gameRef.size.x;
