@@ -22,11 +22,20 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
   GameState state = GameState.welcome;
   int score = 0;
   int highScore = 0;
-  double pipeSpeed = 200.0;
   final pipeSpawner = Timer(1.5, repeat: true);
+
+  late Vector2 birdSize;
+  late double pipeWidth;
+  late double pipeGap;
+  late double groundHeight;
+  late double gameSpeed;
+  late double gravity;
+  late double jumpVelocity;
 
   @override
   Future<void> onLoad() async {
+    _calculateProportionalSizes();
+
     await images.loadAll(['bg.png', 'ground.png', 'bird1.png', 'bird2.png', 'bird3.png', 'pipe.png', 'restart.png']);
     await FlameAudio.audioCache.loadAll(['sfx_wing.mp3', 'sfx_point.mp3', 'crash.mp3']);
 
@@ -34,8 +43,12 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
     highScore = prefs.getInt('highScore') ?? 0;
 
     add(SpriteComponent(sprite: Sprite(images.fromCache('bg.png')), size: size));
-    add(Ground());
-    bird = Bird();
+    add(Ground(height: groundHeight));
+    bird = Bird(
+      initialSize: birdSize,
+      gravity: gravity,
+      jumpVelocity: jumpVelocity,
+    );
     add(bird);
 
     setupUI();
@@ -43,18 +56,28 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
     resetGame();
   }
 
-  void setupUI() {
-    // PERUBAHAN DI SINI: Menghapus `fontFamily` untuk menggunakan font default.
-    final textStyle = TextStyle(fontSize: 48, color: Colors.white, fontWeight: FontWeight.bold);
-    final smallTextStyle = textStyle.copyWith(fontSize: 24);
+  void _calculateProportionalSizes() {
+    birdSize = Vector2(size.x * 0.08, size.x * 0.08 * (24 / 34)); // Aspect ratio asli 34x24
+    pipeWidth = size.x * 0.15;
+    pipeGap = size.y * 0.23;
+    groundHeight = size.y * 0.12;
 
-    scoreText = TextComponent(text: 'Score: 0', position: Vector2(20, 20), textRenderer: TextPaint(style: textStyle.copyWith(fontSize: 32)));
-    highScoreText = TextComponent(text: 'High Score: $highScore', textRenderer: TextPaint(style: smallTextStyle));
-    startText = TextComponent(text: 'TAP TO START', anchor: Anchor.center, position: size / 2, textRenderer: TextPaint(style: textStyle));
-    gameOverText = TextComponent(text: 'GAME OVER', anchor: Anchor.center, textRenderer: TextPaint(style: textStyle.copyWith(fontSize: 64)));
+    gameSpeed = size.x * 0.5; // Kecepatan game (pipa & tanah)
+    gravity = size.y * 1.1;
+    jumpVelocity = -(size.y / 2.8); // Lompatan lebih tinggi pada layar yang lebih besar
   }
 
-  
+  void setupUI() {
+    final bigTextStyle = TextStyle(fontSize: size.x * 0.09, color: Colors.white, fontWeight: FontWeight.bold);
+    final mediumTextStyle = bigTextStyle.copyWith(fontSize: size.x * 0.07);
+    final smallTextStyle = bigTextStyle.copyWith(fontSize: size.x * 0.05);
+
+    scoreText = TextComponent(text: 'Score: 0', position: Vector2(20, 20), textRenderer: TextPaint(style: mediumTextStyle));
+    highScoreText = TextComponent(text: 'High Score: $highScore', textRenderer: TextPaint(style: smallTextStyle));
+    startText = TextComponent(text: 'TAP TO START', anchor: Anchor.center, position: size / 2, textRenderer: TextPaint(style: mediumTextStyle));
+    gameOverText = TextComponent(text: 'GAME OVER', anchor: Anchor.center, textRenderer: TextPaint(style: bigTextStyle));
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -75,10 +98,10 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
   }
 
   void spawnPipes() {
-    double gap = 160;
-    double centerY = Random().nextDouble() * (size.y - 400) + 200;
-    add(Pipe(isTop: true, height: centerY - gap / 2, size: Vector2(80, centerY - gap / 2), position: Vector2(size.x, 0)));
-    add(Pipe(isTop: false, height: size.y - (centerY + gap / 2), size: Vector2(80, size.y - (centerY + gap / 2)), position: Vector2(size.x, centerY + gap / 2)));
+    double centerY = Random().nextDouble() * (size.y - (pipeGap + groundHeight) * 2) + (pipeGap + groundHeight);
+
+    add(Pipe(isTop: true, height: centerY - pipeGap / 2, size: Vector2(pipeWidth, centerY - pipeGap / 2), position: Vector2(size.x, 0)));
+    add(Pipe(isTop: false, height: size.y - (centerY + pipeGap / 2), size: Vector2(pipeWidth, size.y - (centerY + pipeGap / 2)), position: Vector2(size.x, centerY + pipeGap / 2)));
   }
 
   void increaseScore() {
@@ -88,7 +111,7 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   void setGameOver() async {
     if (state == GameState.gameOver) return;
-    
+
     state = GameState.gameOver;
     FlameAudio.play('crash.mp3');
     bird.removeFromParent();
@@ -100,18 +123,18 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
       await prefs.setInt('highScore', highScore);
     }
 
-    gameOverText.position = size / 2 - Vector2(0, 80);
-    scoreText.position = size / 2 + Vector2(-scoreText.width / 2, 0);
+    gameOverText.position = size / 2 - Vector2(0, size.y * 0.1);
+    scoreText.position = size / 2 + Vector2(-scoreText.width / 2, size.y * 0.02);
     highScoreText.text = 'High Score: $highScore';
-    highScoreText.position = size / 2 + Vector2(-highScoreText.width / 2, 50);
-    
+    highScoreText.position = size / 2 + Vector2(-highScoreText.width / 2, size.y * 0.1);
+
     add(gameOverText);
     add(highScoreText);
 
     final restartButton = ButtonComponent(
-      button: SpriteComponent(sprite: Sprite(images.fromCache('restart.png')), size: Vector2(110, 60)),
+      button: SpriteComponent(sprite: Sprite(images.fromCache('restart.png')), size: Vector2(size.x * 0.25, size.x * 0.15)),
       anchor: Anchor.center,
-      position: size / 2 + Vector2(0, 120),
+      position: size / 2 + Vector2(0, size.y * 0.2),
       onPressed: resetGame,
     );
     add(restartButton);
@@ -135,7 +158,7 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
     scoreText.text = 'Score: $score';
     scoreText.position = Vector2(20, 20);
 
-    bird.position = Vector2(100, size.y / 2);
+    bird.position = Vector2(size.x * 0.2, size.y / 2);
     bird.angle = 0;
     if (!bird.isMounted) add(bird);
     if (!scoreText.isMounted) add(scoreText);
